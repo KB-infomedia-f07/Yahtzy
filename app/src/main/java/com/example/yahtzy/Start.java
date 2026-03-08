@@ -22,7 +22,7 @@ import android.widget.Toast;
  * create an instance of this fragment.
  */
 public class Start extends Fragment {
-    MainActivity activity = (MainActivity) getActivity();
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -31,7 +31,6 @@ public class Start extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    Fragment fragment = new PlayerSelect();
     FragmentContainer fragmentContainer;
     Button startButton;
     EditText playersAmt;
@@ -77,26 +76,35 @@ public class Start extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        FragmentManager manager = this.getActivity().getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-
+        // Fetch relevant views
         playersAmt = getView().findViewById(R.id.playersAmt);
 
         startButton = getView().findViewById(R.id.startButton);
+        // OnClick listener for start button
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
-                players = Integer.parseInt(playersAmt.getText().toString());
-                if(0 < players && players <= 6){
-                    //activity.setPlayersAmt(players);
-                    transaction.replace(R.id.fragmentContainerView, fragment);
-                    transaction.commit();
+                try
+                {
+                    players = Integer.parseInt(playersAmt.getText().toString());
+                    if(0 < players && players <= 6){
+                        // Fetching MainActivity and setting playersAmt
+                        MainActivity activity = (MainActivity) requireActivity();
+                        activity.setPlayersAmt(players);
+                        // Changing fragments
+                        Fragment fragment = new PlayerSelect();
+                        FragmentManager manager = requireActivity().getSupportFragmentManager();
+                        FragmentTransaction transaction = manager.beginTransaction();
+                        transaction.replace(R.id.fragmentContainerView, fragment);
+                        transaction.commit();
+                    }
+                    else{
+                        // Error message
+                        Toast.makeText(getContext(),"Please enter a number from 1 to 6",Toast.LENGTH_SHORT).show();
+                    }
                 }
-                else{
-                    Toast.makeText(getContext(),"Please enter a number from 1 to 6",Toast.LENGTH_SHORT).show();
-                }
-                }catch(Exception e){
+                catch(Exception e){
+                    // Error message
                     Toast.makeText(getContext(),"Please enter a number from 1 to 6",Toast.LENGTH_SHORT).show();
                 }
 

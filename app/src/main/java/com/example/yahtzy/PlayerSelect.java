@@ -5,12 +5,18 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,10 +25,13 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class PlayerSelect extends Fragment {
-
-    MainActivity activity = (MainActivity) getActivity();
-    private List<LinearLayout> playerTexts;
+    Player[] players;
+    int playersAmt;
+    private List<EditText> playerTexts = new ArrayList<>();
     LinearLayout playerLayout;
+    Button nextButton;
+
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -72,11 +81,67 @@ public class PlayerSelect extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        playerLayout = getView().findViewById(R.id.playerLayout);
-        for(int i = 0; i < playerLayout.getChildCount(); i++){
-            if(i + 1 > activity.getPlayersAmt()){
-                playerLayout.removeViewAt(i + 1);
+        // Fetch MainActivity and players amount
+        MainActivity activity = (MainActivity) requireActivity();
+        playersAmt = activity.getPlayersAmt();
+
+        // Remove extra players
+        while(true){
+            // try and catch for playerLayout
+            try{
+                playerLayout = requireView().findViewById(R.id.playerLayout);
+                try{
+                    playerLayout.removeViewAt(playersAmt);
+                }
+                catch (Exception e){
+                    // Break when all extras are deleted
+                    break;
+                }
+            }
+            // Necessary catch
+            catch (Exception e){
+                break;
             }
         }
+
+        playerLayout = requireView().findViewById(R.id.playerLayout);
+        for(int i = 0; i < playersAmt; i++){
+            playerTexts.add( (EditText) ( (LinearLayout) playerLayout.getChildAt(i) ).getChildAt(1) );
+        }
+
+        try{
+            nextButton = getActivity().findViewById(R.id.nextButton);
+        }catch (Exception ignore)
+        {
+
+        }
+
+        players = new Player[playersAmt];
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Creating player objects
+                for(int i = 0; i < playersAmt; i++){
+                    try{
+                    players[i] = new Player(playerTexts.get(i).getText().toString());
+                    }catch (Exception e){
+                        players[i] = new Player("player" + i);
+                    }
+
+                }
+                // Setting players in MainActivity
+                MainActivity activity = (MainActivity) requireActivity();
+                activity.setPlayersArr(players);
+
+                // Changing fragments
+                Fragment fragment = new Dice();
+                FragmentManager manager = requireActivity().getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.fragmentContainerView, fragment);
+                transaction.commit();
+            }
+        });
+
     }
 }

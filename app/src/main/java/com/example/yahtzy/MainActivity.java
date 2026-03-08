@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     private int playersAmt;
+    private int currentPlayer = 0;
     private Player[] players;
 
     @Override
@@ -24,8 +25,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void setPlayers(Player[] value){
+    public void setPlayersArr(Player[] value){
         players = value;
+    }
+    public Player[] getPlayersArr(){
+        return players;
+    }
+    public void nextPlayer(){
+        if(currentPlayer < playersAmt){
+            currentPlayer ++;
+        }
+        else{
+            currentPlayer = 0;
+        }
+    }
+    public int getCurrentPlayer(){
+        return currentPlayer;
     }
     public int getPlayersAmt(){
         return playersAmt;
