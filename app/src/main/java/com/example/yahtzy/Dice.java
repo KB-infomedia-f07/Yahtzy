@@ -30,13 +30,10 @@ public class Dice extends Fragment {
     Random rand = new Random();
     private Player player;
     private TextView playerText;
-    private List<Switch> lockSwitch = new ArrayList<>();
     private Button rollButton;
     private Button endButton;
-    private Button cheatSheetButton;
     private LinearLayout diceLayout;
     private List<LinearLayout> dice = new ArrayList<>();
-    private List<View> constraintList;
     private int[] dieStates;
 
     public Dice() {
