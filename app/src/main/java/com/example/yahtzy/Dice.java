@@ -60,31 +60,34 @@ public class Dice extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MainActivity activity = (MainActivity) requireActivity();
 
-        player = activity.getPlayersArr()[activity.getCurrentPlayer()];
-
-        diceLayout = getActivity().findViewById(R.id.dice);
-        rollButton = getActivity().findViewById(R.id.rollButton);
-        playerText = getActivity().findViewById(R.id.playerText);
-
-        playerText.setText(player.Name);
-
-        dieStates = player.dieStates;
+        player = (Player) activity.getPlayersArr()[activity.getCurrentPlayer()];
+        // Widgets
+        diceLayout = requireView().findViewById(R.id.dice);
+        rollButton = requireView().findViewById(R.id.rollButton);
+        endButton = requireView().findViewById(R.id.endButton);
+        playerText = requireView().findViewById(R.id.playerText);
+        // Changing banner
+        playerText.setText(player.getName());
+        // Finding die and their images
+        dieStates = player.getDieStates();
         for(int i = 0; i < diceLayout.getChildCount(); i++){
             dice.add((LinearLayout) diceLayout.getChildAt(i));
             setDie(dieStates[i], (ImageView) dice.get(i).getChildAt(0));
         }
+        // Roll button onClick listener
         rollButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try{
+                    // Check if zero-die is locked
                     for(int i = 0; i < diceLayout.getChildCount(); i++){
                         if(( (Switch) dice.get(i).getChildAt(1) ).isChecked() && dieStates[i] == 0){
                             Toast.makeText(getContext(), "Unlock Mikitaka if you want to roll", Toast.LENGTH_SHORT).show();
                             throw new RuntimeException();
                         }
                     }
-
-                    if(player.rolls < 3){
+                    // Check if player can roll and handle roll
+                    if(player.getRolls() < 3){
                         for(int i = 0; i < diceLayout.getChildCount(); i++){
                             if( !( (Switch) dice.get(i).getChildAt(1) ).isChecked()){
                                 dieStates[i] = rand.nextInt(1,7);
@@ -104,16 +107,24 @@ public class Dice extends Fragment {
         endButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                player.dieStates = dieStates;
+                // Checking if player has rolled before ending turn
+                if(player.getRolls() == 0){
+                    Toast.makeText(getContext(), "You need to roll before ending your turn",Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    player.setDieStates(dieStates);
 
-                Fragment fragment = new Table();
-                FragmentManager manager = requireActivity().getSupportFragmentManager();
-                FragmentTransaction transaction = manager.beginTransaction();
-                transaction.replace(R.id.fragmentContainerView, fragment);
-                transaction.commit();
+                    Fragment fragment = new Table();
+                    FragmentManager manager = requireActivity().getSupportFragmentManager();
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    transaction.replace(R.id.fragmentContainerView, fragment);
+                    transaction.commit();
+                }
             }
         });
     }
+    // Image changing function
     public void setDie(int value, ImageView dieImg){
         if(value == 0){
             dieImg.setImageResource(R.drawable.dice0);

@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     private int playersAmt;
+    private int currentRound;
     private int currentPlayer = 0;
     private Player[] players;
 
@@ -32,10 +33,12 @@ public class MainActivity extends AppCompatActivity {
         return players;
     }
     public void nextPlayer(){
-        if(currentPlayer < playersAmt){
+        // Increment currentPlayer and currentRound
+        if(currentPlayer < playersAmt - 1){
             currentPlayer ++;
         }
         else{
+            currentRound ++;
             currentPlayer = 0;
         }
     }
@@ -47,5 +50,8 @@ public class MainActivity extends AppCompatActivity {
     }
     public void setPlayersAmt(int value){
         playersAmt = value;
+    }
+    public boolean getIfGameEndedState(){
+        return currentRound == 13;
     }
 }
